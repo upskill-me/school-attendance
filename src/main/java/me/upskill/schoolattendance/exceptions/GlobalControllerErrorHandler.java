@@ -35,13 +35,20 @@ public class GlobalControllerErrorHandler {
 
     @ExceptionHandler(MyException.class)
     public ResponseEntity<?> handleMyException(HttpServletRequest request, MyException myEx) {
-        return handleException(request, myEx);
+        ApiError apiError = ApiError.builder()
+                .code(myEx.getCode())
+                .message(myEx.getMessage())
+                .serviceName(properties.getServiceName())
+                .serviceVersion(properties.getServiceVersion())
+                .build();
+
+        return ResponseEntity.status(500).body(apiError);
     }
 
     @ExceptionHandler(StatusCodeMyException.class)
     public ResponseEntity<?> handleStatusCodeMyException(HttpServletRequest request, StatusCodeMyException ex) {
         ApiError apiError = ApiError.builder()
-                .code(INTERNAL_SERVER_ERROR)
+                .code(ex.getCode())
                 .message(ex.getMessage())
                 .serviceName(properties.getServiceName())
                 .serviceVersion(properties.getServiceVersion())

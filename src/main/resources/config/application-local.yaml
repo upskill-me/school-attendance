@@ -1,0 +1,20 @@
+# this profile get activated in local phase
+
+# database configuration
+
+me.upskill.schoolattendance.data-source.jdbcUrl: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+me.upskill.schoolattendance.data-source.username: ${DB_USERNAME}
+me.upskill.schoolattendance.data-source.password: ${DB_PASSWORD}
+me.upskill.schoolattendance.data-source.autoCommit: false
+
+me.upskill.schoolattendance.data-source.connectionTimeout: 1000
+me.upskill.schoolattendance.data-source.maximumPoolSize: 20
+me.upskill.schoolattendance.data-source.poolName: sa-hikari-local-pool
+me.upskill.schoolattendance.data-source.leakDetectionThreshold: 5000
+
+me.upskill.schoolattendance.data-source.initialize: false
+# whether to generate unique name for the data source
+me.upskill.schoolattendance.data-source.generateUniqueName: false
+# the name of the data source
+me.upskill.schoolattendance.data-source.name: sc-ius-local
+me.upskill.schoolattendance.data-source.databaseName: ${DB_NAME}

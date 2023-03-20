@@ -4,6 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import jakarta.transaction.Transactional;
 import me.upskill.schoolattendance.api.entities.jpa.User;
 import me.upskill.schoolattendance.controller.JwtTokenDTO;
 import me.upskill.schoolattendance.controller.LoginDTO;
@@ -32,6 +33,7 @@ public class DefaultAuthService implements AuthService {
     private AppProperties properties;
 
     @Override
+    @Transactional
     public UserDTO register(RegisterDTO dto) {
         // email unique hai ya nahi hai
         // username unique hai ya nahi hai
@@ -41,7 +43,7 @@ public class DefaultAuthService implements AuthService {
             throw new StatusCodeMyException("E1-6100", "email must be unique, choose a different email", 400);
         }
 
-        Optional<User> uUser = userRepository.findByEmail(dto.getUsername());
+        Optional<User> uUser = userRepository.findByUsername(dto.getUsername());
         if (uUser.isPresent()) {
             throw new StatusCodeMyException("E1-6110", "username must be unique, choose a different username", 400);
         }
@@ -70,21 +72,22 @@ public class DefaultAuthService implements AuthService {
 
 
     @Override
+    @Transactional
     public JwtTokenDTO login(LoginDTO dto) {
         Optional<User> uUser = userRepository.findByUsername(dto.getUsername());
 
         if (uUser.isEmpty()) {
-            throw new StatusCodeMyException("E1-6200", "username not found", 404);
-        }
+            Optional<User> eUser = userRepository.findByEmail(dto.getUsername());
 
-        Optional<User> eUser = userRepository.findByEmail(dto.getUsername());
+            if (eUser.isEmpty()) {
+                throw new StatusCodeMyException("E1-6200", "username not found", 404);
+            }
 
-        if (eUser.isEmpty()) {
-            throw new StatusCodeMyException("E1-6210", "email also not found", 404);
+            uUser = eUser;
         }
 
         // password match
-        BCrypt.Result result = BCrypt.verifyer().verify(dto.getPassword().toCharArray(), eUser.get().getPassword());
+        BCrypt.Result result = BCrypt.verifyer().verify(dto.getPassword().toCharArray(), uUser.get().getPassword());
         if (!result.verified) {
             // password is invalid
             throw new StatusCodeMyException("E1-3000", "password is invalid", 401);
@@ -98,8 +101,8 @@ public class DefaultAuthService implements AuthService {
 
             // {header}.{payload}.{signature}
             String token = JWT.create()
-                    .withClaim("username", eUser.get().getUsername())
-                    .withClaim("id", eUser.get().getId())
+                    .withClaim("username", uUser.get().getUsername())
+                    .withClaim("id", uUser.get().getId())
                     .withIssuer(properties.getServiceName())
                     .withExpiresAt(expire)
                     .sign(algorithm);

@@ -23,7 +23,7 @@ public abstract class AbstractController {
     public void assertValidEmail(String arg, String message) {
         try {
             ValidationUtil.assertValid(arg, message);
-            if (arg.matches(EMAIL_REGEX)) {
+            if (!arg.matches(EMAIL_REGEX)) {
                 throw new IllegalArgumentException("email is invalid");
             }
         } catch (IllegalArgumentException ex) {
