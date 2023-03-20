@@ -1,0 +1,4 @@
+me.upskill.schoolattendance.serviceName: School Attendance Management Application
+me.upskill.schoolattendance.serviceVersion: @project.version@
+me.upskill.schoolattendance.genericErrorMessage: Something failed, please try again later
+me.upskill.schoolattendance.secretKey: ${JWT_SECRET_KEY}
