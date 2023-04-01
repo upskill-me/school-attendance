@@ -20,6 +20,16 @@ public abstract class AbstractController {
         }
     }
 
+    public void assertNotNull(Object arg, String message) {
+        try {
+            if (arg == null) {
+                throw new IllegalArgumentException(message);
+            }
+        } catch (IllegalArgumentException ex) {
+            throw new StatusCodeMyException(MANDATORY_PARAMETER_MISSING, message, 400);
+        }
+    }
+
     public void assertValidEmail(String arg, String message) {
         try {
             ValidationUtil.assertValid(arg, message);
